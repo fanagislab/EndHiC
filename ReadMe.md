@@ -188,12 +188,18 @@ cluster_merge.pl z.EndHiC.A.results.summary.cluster  04.summary_and_merging_resu
 #### Format of *.cluster file: 
 
 > In total 5 columns
->> column 1: Cluster id, sorted by cluster length   
->> column 2: Number of contigs included in this cluster 
->> column 3: Cluster length, total length of contigs in this cluster 
+> 
+>> column 1: Cluster id, sorted by cluster length
+
+>> column 2: Number of contigs included in this cluster
+
+>> column 3: Cluster length, total length of contigs in this cluster
+
 >> column 4: robustness, i.e. appearance times in the results from various contig end sizes and contact cutoffs
+>> 
 >> column 5: Included contigs with order and orientation, separated by ";", and "+-" means strands
              e.g. ptg000046l-;ptg000079l+;ptg000058l-;ptg000047l+ (equivalent to ptg000047l-;ptg000058l+;ptg000079l-;ptg000046l+)
+>> 	     
 
 ## 4. Post-EndHiC programs
 
