@@ -1,3 +1,5 @@
+## Introduction
+
 **EndHiC is a fast and easy-to-use Hi-C scaffolding tool, using the Hi-C links from contig end regions instead of whole contig regions to assemble large contigs into chromosomal-level scaffolds.** 
 
 **EndHiC takes the HiC-pro's bin matrix results as input data. After running HiC-pro, a recommended EndHiC usage for most users is to run endhic.pl with default parameters.** 
