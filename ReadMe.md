@@ -2,9 +2,11 @@
 
 **EndHiC is a fast and easy-to-use Hi-C scaffolding tool, using the Hi-C links from contig end regions instead of whole contig regions to assemble large contigs into chromosomal-level scaffolds.** 
 
-**EndHiC takes the HiC-pro's bin matrix results as input data. After running HiC-pro, a recommended EndHiC usage for most users is to run endhic.pl with default parameters.** 
+**EndHiC takes the HiC-Pro's bin matrix results as input data. After running HiC-Pro, a recommended EndHiC usage for most users is to run endhic.pl with default parameters.** 
 
-A command-line example is shown below:
+## Install and run an example
+
+Download or clone the source code and run EndHiC directly, and a command-line example is shown below:
 ```
   git clone git@github.com:fanagislab/EndHiC.git
 
@@ -13,7 +15,9 @@ A command-line example is shown below:
   sh work.sh 
 ```
 
-## 1. Input files: (example, human hifiasm + hic-pro)
+## 1. Input files (for example, human hifiasm-assembled contigs and the output contact matrix of HiC-Pro)
+
+During the development of EndHiC, we used HiC-Pro v2.11.4 and you can also use the latest version v3.1.0 to process Hi-C sequencing data and get the following matrix files.
 
 - hifiasm.fa.len                
     Includes two column:  contig_id	contig_length	
@@ -43,7 +47,7 @@ endhic.pl
 		
 > order_and_orient_GFA.pl
 
-### (1) Basic usage: 
+### (1) Basic usage [run the above scripts step by step]
 
 run endhic with specified contig end size and specified contact cutoff
 
@@ -72,7 +76,7 @@ step5: Output cluster results with order and orientation information
 order_and_orient_GFA.pl --size 2000000 humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.cluster
 ```
 
-### (2) Basic pipeline:
+### (2) Basic pipeline [run from the above step1 to step5]
 
 run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro raw matrix data
 ```
@@ -84,7 +88,7 @@ run endhic with specified contig end size, in various automatically determined c
 endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000_iced.matrix
 ```
 
-### (3) Standard pipeline: [recommend for most users]
+### (3) Standard pipeline [recommend for most users]
 
 Under direcotry 100kb-A/
 
@@ -93,7 +97,7 @@ run endhic with various contig end size, in various automatically determined con
 endhic.pl  hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
 ```
 
-### (4) Iterative standard pipeline: [if one default round of endhic.pl can't finish]
+### (4) Iterative standard pipeline [if one default round of endhic.pl can't finish]
 
 If a single standard pipeline can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of the standard pipeline is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
 
@@ -285,4 +289,3 @@ cluster_compare.pl  human.contigs.minimap2.cluster  z.EndHiC.A.results.summary.c
 ### 6. Reference
 
 **Sen Wang, Hengchao Wang, Fan Jiang, Anqi Wang, Hangwei Liu, Hanbo Zhao, Boyuan Yang, Dong Xu, Yan Zhang, Wei Fan. EndHiC: assemble large contigs into chromosomal-level scaffolds using the Hi-C links from contig ends. (2021)**
-
