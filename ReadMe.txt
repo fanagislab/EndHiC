@@ -28,20 +28,21 @@ A command-line example is shown below:
 
 2. EndHiC programs: (the ranks shows invoking relationship)
 
+endhic_auto.pl
 
-endhic.pl							
+	endhic.pl							
 
-	endhic_ctgEnd_pipeline.pl
+		endhic_ctgEnd_pipeline.pl
 
-		ctgContact_from_ctgEndContacts.pl
-		
-		turningpoint_by_lineartransform.pl
-		
-		scaffold_by_trueCtgContact.pl
-		
-		cluster_and_classify_GFA.pl
-		
-		order_and_orient_GFA.pl
+			ctgContact_from_ctgEndContacts.pl
+			
+			turningpoint_by_lineartransform.pl
+			
+			scaffold_by_trueCtgContact.pl
+			
+			cluster_and_classify_GFA.pl
+			
+			order_and_orient_GFA.pl
 
 
 (1) Basic usage: 
@@ -49,68 +50,54 @@ endhic.pl
 run endhic with specified contig end size and specified contact cutoff
 
 #calculate the HiC contact values among contigs, using Hi-C links data from fixed-size contig ends
+
 ctgContact_from_ctgEndContacts.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix > humanHiC_100000.matrix.100000.10.CtgContact
 
+
 ##adjust the contig contacts, and perform linear transformation, to find the turning point
+
 turningpoint_by_lineartransform.pl humanHiC_100000.matrix.100000.10.CtgContact > humanHiC_100000.matrix.100000.10.CtgContact.adjustTransform 2> humanHiC_100000.matrix.100000.10.CtgContact.turningPoint
 
+
 #build contig graph by assigning links to contigs whose contact is larger than a given cutoff, and also satisfy reciprocal best requirement
+
 scaffold_by_trueCtgContact.pl   --contacts 147.07 --reciprocalmax  hifiasm.fa.len  humanHiC_100000_iced.matrix.100000.10.CtgContact > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa 
 
+
 #Identify linear and circular topology in the contig graph
+
 cluster_and_classify_GFA.pl  humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology
 
+
 #Output cluster results with order and orientation information
+
 order_and_orient_GFA.pl --size 2000000 humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.cluster
 
 
 (2) Basic pipeline:
 
 #run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro raw matrix data
+
 endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix
 
+
 #run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro normalized matrix data
+
 endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000_iced.matrix
 
 
-(3) Standard pipeline: [recommend for most users]
+(3) Standard pipeline: [run only one round of endhic.pl, when contig assembly is quite good] 
 
-Under direcotry 100kb-A/
+##run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
 
-##run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data
 endhic.pl  hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
 
 
-(4) Iterative standard pipeline: [if one default round of endhic.pl can't finish]
+(4) Iterative pipeline: [run multiple rounds of endhic.pl, when contig assembly is not so good]
 
-If a single standard pipeline can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of the standard pipeline is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
+##If a single run of endhic.pl can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of endhic.pl is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
 
-Below is the second running loop of standard pipeline.
-
-
-Under direcotry 100kb-B/
-ln ../100kb-A/humanHiC_100000_abs.bed ./
-ln ../100kb-A/humanHiC_100000_iced.matrix ./
-ln ../100kb-A/humanHiC_100000.matrix ./
-ln ../100kb-A/04.summary_and_merging_results/z.EndHiC.A.results.summary.cluster ./
-
-
-#convert the contig bed file to cluster bed file
-cluster2bed.pl humanHiC_100000_abs.bed z.EndHiC.A.results.summary.cluster  > clusterA_100000_abs.bed  2> clusterA.id.len 
-
-#run standard endhic pipeline with increasing contig end range
-endhic.pl --minbinnum 30 --maxbinnum 50 --clustermark B  clusterA.id.len clusterA_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
-
-#generate final cluster result file in this loop
-cluster_merge.pl z.EndHiC.A.results.summary.cluster  04.summary_and_merging_results/z.EndHiC.B.results.summary.transit > 04.summary_and_merging_results/z.EndHiC.B.results.summary.cluster
-
-
-Note: At most times, Endhic will finish at the chromosomal level scaffolding with one to three running loops. Whether the task is finished or not, we do not suggest running more loops, because as the increasing of contig end size, the signal to noise ratio will drop, the spirit of Endhic do not allow using too larger contig ends. The recommended endhic parameters in each loop are:
-
-"endhic.pl --minbinnum 5  --maxbinnum 25  --clustermark A"  (endhic first loop, default)
-"endhic.pl --minbinnum 30 --maxbinnum 50  --clustermark B"  (endhic second loop)
-"endhic.pl --minbinnum 55 --maxbinnum 75  --clustermark C"  (endhic third loop)
-..........................................................  
+endhic_auto.pl  --rounds 3  hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
 
 
 3. EndHiC output sub-directory and files
@@ -248,5 +235,5 @@ cluster_compare.pl  human.contigs.minimap2.cluster  z.EndHiC.A.results.summary.c
 
 6. Reference
 
-Sen Wang, Hengchao Wang, Fan Jiang, Anqi Wang, Hangwei Liu, Hanbo Zhao, Boyuan Yang, Dong Xu, Yan Zhang, Wei Fan. EndHiC: assemble large contigs into chromosomal-level scaffolds using the Hi-C links from contig ends. (2021)  https://arxiv.org/abs/2111.15411 
+Sen Wang, Hengchao Wang, Fan Jiang, Anqi Wang, Hangwei Liu, Hanbo Zhao, Boyuan Yang, Dong Xu, Yan Zhang, Wei Fan. EndHiC: assemble large contigs into chromosomal-level scaffolds using the Hi-C links from contig ends. (2021)  https://arxiv.org/abs/2111.15411v1
 
