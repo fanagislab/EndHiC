@@ -1,0 +1,4 @@
+#Ctg_id	Error_loc	Inter_contact	Inter_cutoff	Intra_contact1	Intra_contact2	Intra_cutoff	Break_pos	Utg1_id	Utg2_id
+ptg000022l	11450000	0	6.5	878	1410	117.85	11468366	utg000748l	utg000385l
+ptg000050l	14250000	0	7.35	975	1103	120.9	13739674	utg001073l	utg000581l
+ptg000296l	14050000	0	6.9	1381	1015	128.95	14023224	utg000234l	utg001508l
