@@ -13,7 +13,8 @@ Two example data are included in EndHiC package:
   cd EndHiC/z.testing_data/Cichorium_intybus
   sh work.sh
 ``` 
-**Note**: The Arabidopsis_thalina testing data shows the usage of endhic.pl on long-continuous contig assembly, while the Cichorium_intybus testing data shows the usage of endhic_iterate.pl with relatively shorter contig assembly.
+>**Note**
+> The Arabidopsis_thalina testing data shows the usage of endhic.pl on long-continuous contig assembly, while the Cichorium_intybus testing data shows the usage of endhic_iterate.pl with relatively shorter contig assembly.
 
 An example data for detecting the assembly errors in the contigs is also included in EndHiC package:
 ```
@@ -121,29 +122,45 @@ run endhic with specified contig end size and specified contact cutoff
 
 ### Standard pipeline: 
 
-**Note**: run only one round of endhic.pl, when contig assembly is quite good
+>**Note**
+> run only one round of endhic.pl, when contig assembly is quite good
 
 run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
 
-	```
-	endhic.pl  \
-		hifiasm.fa.len \
-		humanHiC_100000_abs.bed \
-		humanHiC_100000.matrix \
-		humanHiC_100000_iced.matrix
-	```
+```
+endhic.pl  \
+	hifiasm.fa.len \
+	humanHiC_100000_abs.bed \
+	humanHiC_100000.matrix \
+	humanHiC_100000_iced.matrix
+```
 
-### Iterative pipeline: [run multiple rounds of endhic.pl, when contig assembly is not so good]
+### Iterative pipeline: 
 
-#### If a single run of endhic.pl can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of endhic.pl is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
+>**Note**
+> run multiple rounds of endhic.pl, when contig assembly is not so good
+
+If a single run of endhic.pl can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of endhic.pl is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
 
 Using default parameters of endhic_iterate.pl
 ```
-endhic_iterate.pl  --rounds 3  --binnumstep 5 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
+endhic_iterate.pl  \
+	--rounds 3  \
+	--binnumstep 5 \
+	hifiasm.fa.len \
+	humanHiC_100000_abs.bed \
+	humanHiC_100000.matrix \
+	humanHiC_100000_iced.matrix
 ```
+
 For more shorter contigs, try to run more rounds with smaller increasing of contig end sizes
 ```
-endhic_iterate.pl  --rounds 15 --binnumstep 1 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
+endhic_iterate.pl  \
+	--rounds 15 \
+	--binnumstep 1 \
+	hifiasm.fa.len \
+	humanHiC_100000_abs.bed \
+	humanHiC_100000.matrix humanHiC_100000_iced.matrix
 ```
 ## EndHiC output sub-directory and files
 
