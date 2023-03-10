@@ -58,11 +58,11 @@ run endhic with specified contig end size and specified contact cutoff
 - **Step 1:**  calculate the HiC contact values among contigs, using Hi-C links data from fixed-size contig ends
 	```
 	ctgContact_from_ctgEndContacts.pl \
-	--binsize 100000 \
-	--binnum 10 hifiasm.fa.len \
-	humanHiC_100000_abs.bed \
-	humanHiC_100000.matrix \
-	> humanHiC_100000.matrix.100000.10.CtgContact
+		--binsize 100000 \
+		--binnum 10 hifiasm.fa.len \
+		humanHiC_100000_abs.bed \
+		humanHiC_100000.matrix \
+		> humanHiC_100000.matrix.100000.10.CtgContact
 	```
 
 - **Step 2:** adjust the contig contacts, and perform linear transformation, to find the turning point
@@ -99,22 +99,39 @@ run endhic with specified contig end size and specified contact cutoff
 
 ### Basic pipeline:
 
-#### run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro raw matrix data
-```
-endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix
-```
+- **Step 1:** run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro **raw** matrix data
+	```
+	endhic_ctgEnd_pipeline.pl \
+		--binsize 100000 \
+		--binnum 10 \
+		hifiasm.fa.len \
+		humanHiC_100000_abs.bed \
+		humanHiC_100000.matrix
+	```
 
-#### run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro normalized matrix data
-```
-endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000_iced.matrix
-```
+- **Step 2:** run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro **normalized** matrix data
+	```
+	endhic_ctgEnd_pipeline.pl \
+		--binsize 100000 \
+		--binnum 10 \
+		hifiasm.fa.len \
+		humanHiC_100000_abs.bed \
+		humanHiC_100000_iced.matrix
+	```
 
-### Standard pipeline: [run only one round of endhic.pl, when contig assembly is quite good] 
+### Standard pipeline: 
 
-#### run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
-```
-endhic.pl  hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
-```
+**Note**: run only one round of endhic.pl, when contig assembly is quite good
+
+run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
+
+	```
+	endhic.pl  \
+		hifiasm.fa.len \
+		humanHiC_100000_abs.bed \
+		humanHiC_100000.matrix \
+		humanHiC_100000_iced.matrix
+	```
 
 ### Iterative pipeline: [run multiple rounds of endhic.pl, when contig assembly is not so good]
 
