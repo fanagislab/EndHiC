@@ -4,7 +4,7 @@ EndHic is a fast and easy-to-use Hi-C scaffolding tool, using the Hi-C links fro
 EndHiC takes the HiC-pro's bin matrix results as input data. After running HiC-pro, the recommended EndHiC usage for most users is to run endhic.pl or endhic_iterate.pl. When your contig assembly is quite good, then endhic.pl [one round of EndHiC] is able to finish the job; When your contig assembly is relatively fragmental, then endhic_iterate.pl [multiple rounds of EndHiC] should be used. How many rounds is needed depend on the contig assembly level, and more fragmental contigs need higher rounds of EndHiC.
 
 Two example data are included in EndHiC package:
-
+```
   git clone git@github.com:fanagislab/EndHiC.git
 
   cd EndHiC/z.testing_data/Arabidopsis_thalina
@@ -12,7 +12,7 @@ Two example data are included in EndHiC package:
 
   cd EndHiC/z.testing_data/Cichorium_intybus
   sh work.sh
-
+``` 
 **Note**: The Arabidopsis_thalina testing data shows the usage of endhic.pl on long-continuous contig assembly, while the Cichorium_intybus testing data shows the usage of endhic_iterate.pl with relatively shorter contig assembly.
 
 An example data for detecting the assembly errors in the contigs is also included in EndHiC package:
@@ -52,57 +52,73 @@ endhic_iterate.pl
 			order_and_orient_GFA.pl
 ```
 
-(1) Basic usage: 
+### Basic usage: 
 
 run endhic with specified contig end size and specified contact cutoff
+- **Step 1:**  calculate the HiC contact values among contigs, using Hi-C links data from fixed-size contig ends
+	```
+	ctgContact_from_ctgEndContacts.pl \
+	--binsize 100000 \
+	--binnum 10 hifiasm.fa.len \
+	humanHiC_100000_abs.bed \
+	humanHiC_100000.matrix \
+	> humanHiC_100000.matrix.100000.10.CtgContact
+	```
 
-#calculate the HiC contact values among contigs, using Hi-C links data from fixed-size contig ends
-```
-ctgContact_from_ctgEndContacts.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix > humanHiC_100000.matrix.100000.10.CtgContact
-```
+- **Step 2:** adjust the contig contacts, and perform linear transformation, to find the turning point
+	```
+	turningpoint_by_lineartransform.pl \
+		humanHiC_100000.matrix.100000.10.CtgContact \
+		> humanHiC_100000.matrix.100000.10.CtgContact.adjustTransform \
+		2> humanHiC_100000.matrix.100000.10.CtgContact.turningPoint
+	```
+- **Step 3:** build contig graph by assigning links to contigs whose contact is larger than a given cutoff, and also satisfy reciprocal best requirement
+	```
+	scaffold_by_trueCtgContact.pl \
+		--contacts 147.07 \
+		--reciprocalmax  hifiasm.fa.len  \
+		humanHiC_100000_iced.matrix.100000.10.CtgContact \
+		> humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa 
+	```
 
-##adjust the contig contacts, and perform linear transformation, to find the turning point
-```
-turningpoint_by_lineartransform.pl humanHiC_100000.matrix.100000.10.CtgContact > humanHiC_100000.matrix.100000.10.CtgContact.adjustTransform 2> humanHiC_100000.matrix.100000.10.CtgContact.turningPoint
-```
+- **Step 5:** Identify linear and circular topology in the contig graph
+	```
+	cluster_and_classify_GFA.pl \
+		humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa \
+		> humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology
+	```
 
-#build contig graph by assigning links to contigs whose contact is larger than a given cutoff, and also satisfy reciprocal best requirement
-```
-scaffold_by_trueCtgContact.pl   --contacts 147.07 --reciprocalmax  hifiasm.fa.len  humanHiC_100000_iced.matrix.100000.10.CtgContact > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa 
-```
+- **Step 6:** Output cluster results with order and orientation information
+	```
+	order_and_orient_GFA.pl \
+		--size 2000000 \
+		humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa \
+		humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology \
+		> humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.cluster
+	```
 
-#Identify linear and circular topology in the contig graph
-```
-cluster_and_classify_GFA.pl  humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology
-```
+### Basic pipeline:
 
-#Output cluster results with order and orientation information
-```
-order_and_orient_GFA.pl --size 2000000 humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.topology > humanHiC_100000_iced.matrix.100000.10.CtgContact.overCutoff.1.0.reciprocalMax.gfa.cluster
-```
-
-(2) Basic pipeline:
-
-#run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro raw matrix data
+#### run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro raw matrix data
 ```
 endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix
 ```
 
-#run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro normalized matrix data
+#### run endhic with specified contig end size, in various automatically determined contact cutoff, using Hic-pro normalized matrix data
 ```
 endhic_ctgEnd_pipeline.pl --binsize 100000 --binnum 10 hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000_iced.matrix
 ```
 
-(3) Standard pipeline: [run only one round of endhic.pl, when contig assembly is quite good] 
+### Standard pipeline: [run only one round of endhic.pl, when contig assembly is quite good] 
 
-##run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
+#### run endhic with various contig end size, in various automatically determined contact cutoff, using Hic-pro raw and normalized matrix data. At most cases, this can generate chromosome-level scaffolds
 ```
 endhic.pl  hifiasm.fa.len humanHiC_100000_abs.bed humanHiC_100000.matrix humanHiC_100000_iced.matrix
 ```
 
-(4) Iterative pipeline: [run multiple rounds of endhic.pl, when contig assembly is not so good]
+### Iterative pipeline: [run multiple rounds of endhic.pl, when contig assembly is not so good]
 
-##If a single run of endhic.pl can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of endhic.pl is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
+#### If a single run of endhic.pl can't finish the scaffolding task, i.e. the number of resulting clusters is more than that of chromosomes, iterative running of endhic.pl is recommended. In each loop, the contig end size is increasing. In this way, the problems caused by the repeat sequences on the contig ends will be overcomed.
 
 Using default parameters of endhic_iterate.pl
 ```
