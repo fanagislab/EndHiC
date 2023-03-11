@@ -3,6 +3,24 @@ EndHic is a fast and easy-to-use Hi-C scaffolding tool, using the Hi-C links fro
 
 EndHiC takes the HiC-pro's bin matrix results as input data. After running HiC-pro, the recommended EndHiC usage for most users is to run endhic.pl or endhic_iterate.pl. When your contig assembly is quite good, then endhic.pl [one round of EndHiC] is able to finish the job; When your contig assembly is relatively fragmental, then endhic_iterate.pl [multiple rounds of EndHiC] should be used. How many rounds is needed depend on the contig assembly level, and more fragmental contigs need higher rounds of EndHiC.
 
+Contents
+========
+- [Example Data](#example-data)
+- [Usage instructions](#usage-instructions)
+- [EndHiC programs](#endhic-programs)
+	- [Basic usage](#basic-usage)
+	- [Basic pipeline](#basic-pipeline)
+	- [Standard pipeline](#standard-pipeline)
+	- [Iterative pipeline](#iterative-pipeline)
+- [EndHiC output sub-directory and files](#endhic-output-sub-directory-and-files)
+- [Pre-EndHiC programs](#pre-endhic-programs)
+- [Post-EndHiC programs](#post-endhic-programs)
+- [Accuracy verifying programs](#accuracy-verifying-programs)
+- [Reference](#reference)
+- [Contact](#contact)
+
+## Example Data:
+
 Two example data are included in EndHiC package:
 ```
   git clone git@github.com:fanagislab/EndHiC.git
@@ -450,8 +468,8 @@ Format of ***.cluster file**:
 Sen Wang, Hengchao Wang, Fan Jiang, Anqi Wang, Hangwei Liu, Hanbo Zhao, Boyuan Yang, Dong Xu, Yan Zhang, Wei Fan. EndHiC: assemble large contigs into chromosomal-level scaffolds using the Hi-C links from contig ends. (2021)  https://arxiv.org/abs/2111.15411v1
 
 
-## Contact any of these authors for help:
-
+## Contact 
+Contact any of these authors for help:
 **Wei Fan**, 0000-0001-5036-8733  fanwei@cass.cn  or fanweiagis@126.com   
 **Sen Wang**,  0000-0001-9793-4472  wangsen1993@163.com   
 **Hengchao Wang**, 0000-0002-8754-4195  wanghengchao000@qq.com  
